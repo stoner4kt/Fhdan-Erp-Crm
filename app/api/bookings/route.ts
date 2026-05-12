@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
-import type { Database } from "@/types/supabase";
 import { notifyNewBooking } from "@/lib/notifications";
 
 // GET /api/bookings — list bookings (role-filtered by RLS)
@@ -81,9 +80,9 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Update vehicle status to 'booked'
-  await supabase
+  await (supabase as any)
     .from("vehicles")
-    .update({ status: "booked", updated_at: new Date().toISOString() } as Database["public"]["Tables"]["vehicles"]["Update"])
+    .update({ status: "booked", updated_at: new Date().toISOString() })
     .eq("id", body.vehicle_id);
 
   // Fire-and-forget notifications
