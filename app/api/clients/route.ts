@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   const { data: existing } = await existingQuery.maybeSingle();
   if (existing) {
     // Client exists — update and return
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await (supabase as any)
       .from("clients")
       .update({ ...rest, id_number, updated_at: new Date().toISOString() })
       .eq("id", existing.id)
