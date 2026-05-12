@@ -9,8 +9,8 @@ import {
   LayoutDashboard, Truck, CalendarCheck, Users, CircleDollarSign,
   UserCheck, ShieldCheck, Settings, Route, LogOut, ChevronRight, Truck as TruckIcon,
 } from "lucide-react";
-import { cn, getRoleLabel, getRoleColor } from "@/lib/utils";
-import { can, getVisibleNavItems } from "@/lib/rbac";
+import { cn } from "@/lib/utils";
+import { getRoleLabel, getRoleColor, can, getVisibleNavItems } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {

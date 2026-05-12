@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 import { notifyNewBooking } from "@/lib/notifications";
 
 // GET /api/bookings — list bookings (role-filtered by RLS)
@@ -42,7 +43,11 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "booking_create")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
