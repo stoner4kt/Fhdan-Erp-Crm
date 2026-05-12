@@ -7,13 +7,14 @@ import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
 import { voucherToBase64 } from "@/lib/pdf-voucher";
 import { sendVoucherEmail } from "@/lib/notifications";
+import type { UserRole } from "@/types";
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "voucher_generate")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

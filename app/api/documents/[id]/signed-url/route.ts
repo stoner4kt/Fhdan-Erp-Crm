@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 
 const VAULT_BUCKET = process.env.NEXT_PUBLIC_VAULT_BUCKET ?? "secure-documents";
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 60 minutes
@@ -18,7 +19,7 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role, email").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role, email").eq("id", user.id).single<{ role: UserRole; email: string }>();
   if (!profile || !can(profile.role, "document_download")) {
     return NextResponse.json({ error: "Forbidden — Document access restricted by RBAC policy" }, { status: 403 });
   }

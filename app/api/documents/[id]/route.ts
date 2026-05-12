@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 
 const VAULT_BUCKET = process.env.NEXT_PUBLIC_VAULT_BUCKET ?? "secure-documents";
 
@@ -20,7 +21,7 @@ export async function DELETE(
     .from("user_profiles")
     .select("role, email")
     .eq("id", user.id)
-    .single();
+    .single<{ role: UserRole; email: string }>();
 
   if (!profile || !can(profile.role, "document_delete")) {
     return NextResponse.json(
