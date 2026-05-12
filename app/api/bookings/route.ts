@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   // Double-booking prevention via PostgreSQL function
-  const { data: avail, error: availErr } = await supabase.rpc("check_vehicle_availability", {
+  const { data: avail, error: availErr } = await (supabase as any).rpc("check_vehicle_availability", {
     p_vehicle_id: body.vehicle_id,
     p_pickup_datetime: body.pickup_datetime,
     p_dropoff_datetime: body.dropoff_datetime,
