@@ -5,7 +5,11 @@ import { Resend } from "resend";
 import type { Booking } from "@/types";
 import { formatDateTime, formatZAR, BOOKING_TYPE_LABELS } from "./utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient(): Resend | null {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return null;
+  return new Resend(apiKey);
+}
 
 // ----------------------------
 // TELEGRAM ALERTS
@@ -91,6 +95,8 @@ export async function sendVoucherEmail(params: {
   const { toEmail, toName, bookingRef, voucherPdfBase64, booking } = params;
 
   try {
+    const resend = getResendClient();
+    if (!resend) return false;
     const { error } = await resend.emails.send({
       from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
       to: [toEmail],
@@ -119,6 +125,8 @@ export async function sendArrivalAlertEmail(params: {
   const agencyEmail = process.env.RESEND_FROM_EMAIL!;
 
   try {
+    const resend = getResendClient();
+    if (!resend) return false;
     const { error } = await resend.emails.send({
       from: `${process.env.RESEND_FROM_NAME} <${agencyEmail}>`,
       to: [agencyEmail],
@@ -142,6 +150,8 @@ export async function sendDepositReminderEmail(params: {
   const { toEmail, toName, booking } = params;
 
   try {
+    const resend = getResendClient();
+    if (!resend) return false;
     const { error } = await resend.emails.send({
       from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
       to: [toEmail],
