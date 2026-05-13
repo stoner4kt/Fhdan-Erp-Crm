@@ -5,13 +5,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "client_view")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

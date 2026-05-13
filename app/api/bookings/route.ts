@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 import { notifyNewBooking } from "@/lib/notifications";
 
 // GET /api/bookings — list bookings (role-filtered by RLS)
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single<{ role: UserRole }>();
   if (!profile) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const url = new URL(req.url);
@@ -42,7 +43,11 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "booking_create")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -50,7 +55,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
 
   // Double-booking prevention via PostgreSQL function
-  const { data: avail, error: availErr } = await supabase.rpc("check_vehicle_availability", {
+  const { data: avail, error: availErr } = await (supabase as any).rpc("check_vehicle_availability", {
     p_vehicle_id: body.vehicle_id,
     p_pickup_datetime: body.pickup_datetime,
     p_dropoff_datetime: body.dropoff_datetime,
@@ -75,7 +80,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Update vehicle status to 'booked'
-  await supabase
+  await (supabase as any)
     .from("vehicles")
     .update({ status: "booked", updated_at: new Date().toISOString() })
     .eq("id", body.vehicle_id);

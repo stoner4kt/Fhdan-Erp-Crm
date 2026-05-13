@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
+import type { UserRole } from "@/types";
 
 // GET /api/clients — list all clients (paginated)
 export async function GET(req: NextRequest) {
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "client_view")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single();
+  const { data: profile } = await supabase.from("user_profiles").select("role").eq("id", user.id).single<{ role: UserRole }>();
   if (!profile || !can(profile.role, "client_create")) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -54,10 +55,10 @@ export async function POST(req: NextRequest) {
     existingQuery = existingQuery.eq("email", email);
   }
 
-  const { data: existing } = await existingQuery.maybeSingle();
+  const { data: existing } = await existingQuery.maybeSingle<{ id: string }>();
   if (existing) {
     // Client exists — update and return
-    const { data: updated, error } = await supabase
+    const { data: updated, error } = await (supabase as any)
       .from("clients")
       .update({ ...rest, id_number, updated_at: new Date().toISOString() })
       .eq("id", existing.id)
