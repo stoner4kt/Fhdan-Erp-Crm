@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
 
+export const runtime = "edge";
 const VAULT_BUCKET = process.env.NEXT_PUBLIC_VAULT_BUCKET ?? "secure-documents";
 
 export async function DELETE(

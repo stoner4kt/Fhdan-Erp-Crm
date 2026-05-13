@@ -8,6 +8,7 @@ import { BookingsList } from "@/components/bookings/BookingsList";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Bookings" };
 
 export default async function BookingsPage({

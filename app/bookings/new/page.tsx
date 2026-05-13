@@ -8,6 +8,7 @@ import { BookingForm } from "@/components/bookings/BookingForm";
 import { can } from "@/lib/rbac";
 import type { UserProfile, Vehicle, Driver } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "New Booking" };
 
 export default async function NewBookingPage() {

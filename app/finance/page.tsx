@@ -8,6 +8,7 @@ import { FinanceDashboard } from "@/components/finance/FinanceDashboard";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Finance" };
 
 export default async function FinancePage() {

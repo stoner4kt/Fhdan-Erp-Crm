@@ -8,6 +8,7 @@ import { DriversTable } from "@/components/drivers/DriversTable";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Drivers" };
 
 export default async function DriversPage() {

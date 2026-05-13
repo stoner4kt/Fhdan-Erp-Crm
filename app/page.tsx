@@ -2,13 +2,18 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export const runtime = "edge";
 export default async function RootPage() {
-  const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-  if (user) {
-    redirect("/dashboard");
-  } else {
-    redirect("/auth/login");
+    if (user) {
+      redirect("/dashboard");
+    }
+  } catch {
+    // If Supabase env is not configured yet, default to login route.
   }
+
+  redirect("/auth/login");
 }

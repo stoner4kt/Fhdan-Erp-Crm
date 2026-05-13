@@ -7,6 +7,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Settings" };
 
 export default async function SettingsPage() {

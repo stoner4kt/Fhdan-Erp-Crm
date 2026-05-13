@@ -7,6 +7,7 @@ import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
 
 // GET /api/vehicles — list all vehicles with optional status filter
+export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

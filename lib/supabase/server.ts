@@ -5,13 +5,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/supabase";
+import { getServiceRoleKey, getSupabaseEnv } from "@/lib/supabase/env";
 
 export function createClient() {
   const cookieStore = cookies();
 
+  const supabaseEnv = getSupabaseEnv();
+
+  if (!supabaseEnv) {
+    throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.");
+  }
+
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseEnv.url,
+    supabaseEnv.anonKey,
     {
       cookies: {
         getAll() {
@@ -33,9 +40,16 @@ export function createClient() {
 
 // Service role client — bypasses RLS (use ONLY in trusted server contexts)
 export function createServiceClient() {
+  const supabaseEnv = getSupabaseEnv();
+  const serviceRoleKey = getServiceRoleKey();
+
+  if (!supabaseEnv || !serviceRoleKey) {
+    throw new Error("Missing Supabase server environment variables.");
+  }
+
   return createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    supabaseEnv.url,
+    serviceRoleKey,
     {
       cookies: {
         getAll() { return []; },
