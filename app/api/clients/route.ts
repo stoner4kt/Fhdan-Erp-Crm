@@ -7,6 +7,7 @@ import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
 
 // GET /api/clients — list all clients (paginated)
+export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const supabase = createServerClient();
   const { data: { user } } = await supabase.auth.getUser();

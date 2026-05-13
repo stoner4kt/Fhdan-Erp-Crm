@@ -8,6 +8,7 @@ import { VehicleGrid } from "@/components/fleet/VehicleGrid";
 import { can } from "@/lib/rbac";
 import type { UserProfile, Vehicle } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Fleet Management" };
 
 export default async function FleetPage() {

@@ -2,6 +2,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
+export const runtime = "edge";
 export default async function RootPage() {
   try {
     const supabase = createClient();

@@ -8,6 +8,7 @@ import type { UserRole } from "@/types";
 import { notifyNewBooking } from "@/lib/notifications";
 
 // GET /api/bookings — list bookings (role-filtered by RLS)
+export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

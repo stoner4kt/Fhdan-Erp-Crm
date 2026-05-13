@@ -8,6 +8,7 @@ import { DocumentVault } from "@/components/vault/DocumentVault";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Document Vault" };
 
 export default async function VaultPage() {

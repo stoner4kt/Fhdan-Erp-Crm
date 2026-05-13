@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
 
+export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

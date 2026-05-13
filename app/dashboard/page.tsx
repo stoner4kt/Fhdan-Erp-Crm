@@ -8,6 +8,7 @@ import { DispatcherCockpit } from "@/components/dashboard/DispatcherCockpit";
 import { can } from "@/lib/rbac";
 import type { UserProfile } from "@/types";
 
+export const runtime = "edge";
 export const metadata = { title: "Dispatcher's Cockpit" };
 
 export default async function DashboardPage() {

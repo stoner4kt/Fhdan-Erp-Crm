@@ -9,6 +9,7 @@ import { voucherToBase64 } from "@/lib/pdf-voucher";
 import { sendVoucherEmail } from "@/lib/notifications";
 import type { UserRole } from "@/types";
 
+export const runtime = "edge";
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();

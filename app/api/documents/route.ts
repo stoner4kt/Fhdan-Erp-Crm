@@ -9,6 +9,7 @@ import { createServiceClient } from "@/lib/supabase/server";
 import { can } from "@/lib/rbac";
 import type { UserRole } from "@/types";
 
+export const runtime = "edge";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 const VAULT_BUCKET = process.env.NEXT_PUBLIC_VAULT_BUCKET ?? "secure-documents";
