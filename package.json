@@ -4,10 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && rm -rf .next/cache",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:vercel": "next build",
+    "build:cloudflare": "npx @cloudflare/next-on-pages@1"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.4",
