@@ -21,7 +21,7 @@ export default async function BookingsPage({
   if (!user) redirect("/auth/login");
 
   const { data: profile } = await supabase.from("user_profiles").select("*").eq("id", user.id).single();
-  if (!profile) redirect("/auth/login");
+  if (!profile) redirect("/unauthorized?reason=missing_profile");
 
   const isDriver = profile.role === "driver";
   const page = parseInt(searchParams.page ?? "1");

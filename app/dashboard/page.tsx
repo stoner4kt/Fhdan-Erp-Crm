@@ -24,10 +24,10 @@ export default async function DashboardPage() {
     .eq("id", user.id)
     .single();
 
-  if (!profile) redirect("/auth/login");
+  if (!profile) redirect("/unauthorized?reason=missing_profile");
 
   if (!can(profile.role, "dispatcher_cockpit") && !can(profile.role, "booking_view_own_trips")) {
-    redirect("/auth/login");
+    redirect("/unauthorized?reason=role_denied");
   }
 
   // Fetch dashboard stats

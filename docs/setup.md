@@ -176,6 +176,9 @@ supabase functions deploy send-notifications
 
 ## Step 7 — Deploy to Cloudflare Pages
 
+
+> If you manage Cloudflare config in `wrangler.toml`, keep non-sensitive `NEXT_PUBLIC_*` values in `[vars]` and keep sensitive server keys in Cloudflare Secrets.
+
 1. Push your code to GitHub:
    ```bash
    git init
@@ -190,11 +193,17 @@ supabase functions deploy send-notifications
 3. Connect to GitHub → select your repository
 4. Build settings:
    - Framework preset: `Next.js`
-   - Build command: `npm run build`
-   - Build output directory: `.next`
-5. Add Environment Variables (same as your `.env.local`):
+   - Build command: `npm run build:cloudflare`
+   - Build output directory: `.vercel/output/static`
+5. Add Environment Variables in **both Preview and Production** environments:
+
+   **Set as plain text variables (safe for browser exposure):**
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_APP_URL` (your Cloudflare Pages URL)
+   - `NEXT_PUBLIC_VAULT_BUCKET` (recommended: `secure-documents`)
+
+   **Set as Secrets (server-only sensitive values):**
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `RESEND_API_KEY`
    - `RESEND_FROM_EMAIL`
@@ -205,10 +214,12 @@ supabase functions deploy send-notifications
    - `TELEGRAM_CHAT_ID_FINANCE`
    - `CALLMEBOT_PHONE`
    - `CALLMEBOT_APIKEY`
-   - `NEXTAUTH_SECRET`
-   - `NEXT_PUBLIC_APP_URL` (your Cloudflare Pages URL)
-   - `NEXT_PUBLIC_VAULT_BUCKET=secure-documents`
-6. Click **Save and Deploy**
+
+6. Validate envs locally before pushing:
+   ```bash
+   npm run env:check
+   ```
+7. Click **Save and Deploy**
 
 ### Alternative: Netlify Deploy
 
