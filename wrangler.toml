@@ -2,3 +2,9 @@ name = "fhdan-erp-crm"
 compatibility_date = "2026-05-13"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = ".vercel/output/static"
+
+[vars]
+NEXT_PUBLIC_APP_URL = "https://fhdan-erp-crm.pages.dev"
+NEXT_PUBLIC_SUPABASE_URL = "https://nemfarghehvezfzptrjo.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lbWZhcmdoZWh2ZXpmenB0cmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODA5ODUsImV4cCI6MjA5NDE1Njk4NX0.OCoQIGhXA34ZZAE9OQ2j3OgoOoWNPPCXRP7NAsM-ulE"
+NEXT_PUBLIC_VAULT_BUCKET = "secure-documents"
