@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
-import { loginAction } from "./actions";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const supabase = createClient();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,11 +19,22 @@ export default function LoginPage() {
 
     try {
       const formData = new FormData(e.currentTarget);
-      const result = await loginAction(formData);
+      const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
+      const password = (formData.get("password") as string | null) ?? "";
 
-      if (!result.success) {
-        setError(result.error || "Login failed");
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setError(error.message || "Login failed");
+        setLoading(false);
+        return;
       }
+
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred";
