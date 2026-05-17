@@ -1,7 +1,7 @@
 // ============================================================
 // DISPATCHER'S COCKPIT — Real-time fleet overview
 // ============================================================
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { DispatcherCockpit } from "@/components/dashboard/DispatcherCockpit";
@@ -18,11 +18,30 @@ export default async function DashboardPage() {
   if (!user) redirect("/auth/login");
 
   // Fetch user profile with role
-  const { data: profile } = await supabase
+  let { data: profile } = await supabase
     .from("user_profiles")
     .select("*")
     .eq("id", user.id)
     .single();
+
+  if (!profile) {
+    const adminSupabase = createServiceClient();
+    await adminSupabase.from("user_profiles").upsert({
+      id: user.id,
+      email: user.email ?? "",
+      full_name: (user.user_metadata?.full_name as string | undefined) ?? (user.email?.split("@")[0] ?? "User"),
+      role: "sales_agent",
+      is_active: true,
+    });
+
+    const { data: hydratedProfile } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    profile = hydratedProfile;
+  }
 
   if (!profile) redirect("/unauthorized?reason=missing_profile");
 
