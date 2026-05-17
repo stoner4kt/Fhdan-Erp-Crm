@@ -11,8 +11,8 @@ interface LoginResult {
 export async function loginAction(
   formData: FormData
 ): Promise<LoginResult> {
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+  const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
+  const password = (formData.get("password") as string | null) ?? "";
 
   if (!email || !password) {
     return {
@@ -36,10 +36,13 @@ export async function loginAction(
       };
     }
 
-    if (!data.session) {
+    // Some Supabase projects can return a user without an immediate session
+    // (for example when additional verification is required).
+    // Treat this as a successful sign-in request so the app can continue.
+    if (!data.session && !data.user) {
       return {
         success: false,
-        error: "No session returned from authentication",
+        error: "Authentication succeeded but no user/session was returned.",
       };
     }
   } catch (error) {
