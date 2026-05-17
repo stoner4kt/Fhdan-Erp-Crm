@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -14,7 +13,6 @@ type RoleLoginPageProps = {
 };
 
 export function RoleLoginPage({ current, variants }: RoleLoginPageProps) {
-  const router = useRouter();
   const supabase = createClient();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,8 +40,13 @@ export function RoleLoginPage({ current, variants }: RoleLoginPageProps) {
         return;
       }
 
-      router.replace("/dashboard");
-      router.refresh();
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        setError("Signed in, but your session is not ready yet. Please click Sign in again.");
+        return;
+      }
+
+      window.location.assign("/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(message);
