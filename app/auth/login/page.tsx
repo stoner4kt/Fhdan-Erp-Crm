@@ -1,56 +1,30 @@
-// ============================================================
-// LOGIN PAGE
-// ============================================================
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
+import { loginAction } from "./actions";
 
 export default function LoginPage() {
-  const router = useRouter();
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
     try {
-      const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-        return;
+      const formData = new FormData(e.currentTarget);
+      const result = await loginAction(formData);
+
+      if (!result.success) {
+        setError(result.error || "Login failed");
       }
-
-      if (!authData.user) {
-        setError("Login succeeded but no user session was returned. Please try again.");
-        return;
-      }
-
-      const { data: profile, error: profileError } = await supabase
-        .from("user_profiles")
-        .select("role")
-        .eq("id", authData.user.id)
-        .single();
-
-      if (profileError || !profile) {
-        setError("Your profile could not be loaded. Please contact an administrator.");
-        return;
-      }
-
-      router.replace("/dashboard");
-      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unexpected login error.");
-    } finally {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred";
+      setError(message);
       setLoading(false);
     }
   }
@@ -127,13 +101,13 @@ export default function LoginPage() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 autoComplete="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-lg border bg-background px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
                 placeholder="you@fhdantourism.co.za"
+                disabled={loading}
               />
             </div>
 
@@ -144,18 +118,19 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   id="password"
+                  name="password"
                   type={showPass ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full rounded-lg border bg-background px-3 py-2.5 pr-10 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition-shadow"
                   placeholder="••••••••"
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  disabled={loading}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
                 >
                   {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
