@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
 import { loginAction } from "./actions";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -18,9 +20,14 @@ export default function LoginPage() {
       const formData = new FormData(e.currentTarget);
       const result = await loginAction(formData);
 
-      if (!result.success) {
-        setError(result.error || "Login failed");
+      if (!result?.success) {
+        setError(result?.error || "Login failed");
+        setLoading(false);
+        return;
       }
+
+      router.push(result.redirectTo || "/dashboard");
+      router.refresh();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "An unexpected error occurred";

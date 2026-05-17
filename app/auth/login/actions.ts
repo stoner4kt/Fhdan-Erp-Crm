@@ -1,11 +1,11 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 interface LoginResult {
   success: boolean;
   error?: string;
+  redirectTo?: string;
 }
 
 export async function loginAction(
@@ -50,5 +50,8 @@ export async function loginAction(
     };
   }
 
-  redirect("/dashboard");
+  return {
+    success: true,
+    redirectTo: "/dashboard",
+  };
 }
