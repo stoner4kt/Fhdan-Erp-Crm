@@ -3,7 +3,11 @@ const nextConfig = {
   // Enable experimental features for App Router
   experimental: {
     serverActions: {
-      allowedOrigins: ["localhost:3000"],
+      allowedOrigins: [
+        "localhost:3000",
+        "localhost",
+        process.env.NEXT_PUBLIC_APP_URL || "",
+      ].filter(Boolean),
     },
   },
   // Temporary deployment unblock: repository has extensive legacy TS issues.
