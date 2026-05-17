@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff, LogIn, Truck } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
 import type { LoginVariant } from "@/app/auth/login/login-variants";
 
@@ -13,7 +12,6 @@ type RoleLoginPageProps = {
 };
 
 export function RoleLoginPage({ current, variants }: RoleLoginPageProps) {
-  const supabase = createClient();
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,25 +26,20 @@ export function RoleLoginPage({ current, variants }: RoleLoginPageProps) {
       const email = (formData.get("email") as string | null)?.trim().toLowerCase() ?? "";
       const password = (formData.get("password") as string | null) ?? "";
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-      if (error) {
-        setError(error.message || "Login failed");
+      const result = (await response.json().catch(() => null)) as { success?: boolean; error?: string; redirectTo?: string } | null;
+
+      if (!response.ok || !result?.success) {
+        setError(result?.error || "Login failed");
         return;
       }
 
-      if (!data.user) {
-        setError("Sign in succeeded but user details were not returned. Please retry.");
-        return;
-      }
-
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData.session) {
-        setError("Signed in, but your session is not ready yet. Please click Sign in again.");
-        return;
-      }
-
-      window.location.assign("/dashboard");
+      window.location.assign(result.redirectTo || "/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "An unexpected error occurred";
       setError(message);
